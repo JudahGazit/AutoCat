@@ -94,11 +94,9 @@ class CatOptimizer:
         return data
 
     def _convert_by_kind(self, data):
+        convertors = dict(one_hot=self._convert_to_one_hot, ordinal=self._convert_categories_to_numeric)
         for column, kind in self.category_kind.items():
-            if kind == 'one_hot':
-                data = self._convert_to_one_hot(data, column)
-            else:
-                data = self._convert_categories_to_numeric(data, column)
+            data = convertors[kind](data, column)
         return data
 
     def fit_transform(self, data: pd.DataFrame, target: pd.Series):
