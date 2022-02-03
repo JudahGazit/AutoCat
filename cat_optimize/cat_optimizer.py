@@ -42,7 +42,7 @@ class CatOptimizer:
             if len(value_counts) > self.min_categories_to_handle and len(convert_to_else) > 1:
                 effect_on_target = data_with_target.groupby(column).mean().loc[convert_to_else][target.name]
                 _, p = scipy.stats.shapiro(effect_on_target)
-                if p < 0.05:
+                if p < 0.05 and len(convert_to_else) > 10:
                     clusters = pd.qcut(effect_on_target, 3, labels=range(3))
                     self.small_categories_mapping[column] = dict(zip(effect_on_target.index, clusters))
                     new_categories = [category for category in self.category_mapping[column] if category not in convert_to_else] +\
