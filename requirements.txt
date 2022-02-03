@@ -1,5 +1,9 @@
-sklearn
-matplotlib
-numpy
-pandas
-scipy
+sklearn~=0.0
+matplotlib~=3.5.1
+numpy~=1.21.5
+pandas~=1.4.0
+scipy~=1.7.3
+statsmodels
+scikit-learn~=1.0.2
+seaborn~=0.11.2
+shap~=0.40.0
