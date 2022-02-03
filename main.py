@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import scipy.stats
 import sklearn as sklearn
 import seaborn as sns
 import shap
@@ -84,5 +85,7 @@ if __name__ == '__main__':
         sns.histplot(data={'naive': np.abs(errors_naive_test.values), 'auto': np.abs(errors_auto_test.values)},
                      legend=['naive', 'auto'], kde=True, )
         plt.show()
+
+        print('KS', scipy.stats.ks_2samp(np.abs(errors_naive_test.values), np.abs(errors_auto_test.values)))
 
 

@@ -89,7 +89,8 @@ class CatOptimizer:
 
     def _convert_to_one_hot(self, data, column):
         one_hot = pd.get_dummies(data[column])
-        data = data.drop(columns=[column]).join(one_hot, rsuffix=f'_{column}')
+        one_hot = one_hot.rename(columns={category: f'{column}={category}' for category in one_hot.columns})
+        data = data.drop(columns=[column]).join(one_hot)
         return data
 
     def _convert_by_kind(self, data):
