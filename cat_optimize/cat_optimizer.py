@@ -43,13 +43,17 @@ class CatOptimizer:
                 effect_on_target = data_with_target.groupby(column).mean().loc[convert_to_else][target.name]
                 _, p = scipy.stats.shapiro(effect_on_target)
                 if p < 0.05 and len(convert_to_else) > 10:
-                    clusters = pd.qcut(effect_on_target, 3, labels=range(3))
-                    self.small_categories_mapping[column] = dict(zip(effect_on_target.index, clusters))
-                    new_categories = [category for category in self.category_mapping[column] if category not in convert_to_else] +\
-                                     [f'{self.default_cat_name}_{i}' for i in np.unique(clusters)]
+                    new_categories = self.__split_into_several_bins(column, convert_to_else, effect_on_target)
                 else:
                     new_categories = [category for category in self.category_mapping[column] if category not in convert_to_else] + [self.default_cat_name]
                 self.category_mapping[column] = pd.Index(new_categories)
+
+    def __split_into_several_bins(self, column, convert_to_else, effect_on_target):
+        clusters = pd.qcut(effect_on_target, 3, labels=range(3))
+        self.small_categories_mapping[column] = dict(zip(effect_on_target.index, clusters))
+        new_categories = [category for category in self.category_mapping[column] if category not in convert_to_else] + \
+                         [f'{self.default_cat_name}_{i}' for i in np.unique(clusters)]
+        return new_categories
 
     def _convert_missing_categories(self, data):
         for column in self.category_mapping:
@@ -68,13 +72,16 @@ class CatOptimizer:
             _, p_value = scipy.stats.shapiro(mean_target)
             if p_value < 0.05:
                 self.category_kind[column] = 'ordinal'
-                correlation_to_target = self.__corr_of_categories(data[column], target)
-                sorted_categories = correlation_to_target.sort_values().index.to_list()
-                self.category_mapping[column] = sorted_categories
-                data[column] = data[column].cat.reorder_categories(sorted_categories)
+                self.__sort_category_by_correlation(column, data, target)
             else:
                 self.category_kind[column] = 'one_hot'
         return data
+
+    def __sort_category_by_correlation(self, column, data, target):
+        correlation_to_target = self.__corr_of_categories(data[column], target)
+        sorted_categories = correlation_to_target.sort_values().index.to_list()
+        self.category_mapping[column] = sorted_categories
+        data[column] = data[column].cat.reorder_categories(sorted_categories)
 
     def _convert_categories_to_numeric(self, data, column):
         data[column] = data[column].cat.codes

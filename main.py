@@ -6,6 +6,7 @@ import shap
 from matplotlib import pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
+from xgboost import XGBRegressor
 
 from cat_optimize.cat_optimizer import CatOptimizer
 from cat_optimize.transformers.naive_cat import NaiveCategories
@@ -29,8 +30,9 @@ def err_hist(ax, y_true, y_pred):
 dataset_models = [
     dict(file_path='./evaluate/datasets/Car_Prices_Poland_Kaggle.csv',
          prep=CarPrices(),
-         model=RandomForestRegressor(n_estimators=20, min_samples_leaf=5, max_depth=10),
-         # model=LinearRegression(),
+         # model=RandomForestRegressor(n_estimators=20, min_samples_leaf=5, max_depth=10),
+         model=LinearRegression(),
+         # model=XGBRegressor(max_depth=5, n_estimators=20),
          metrics=[sklearn.metrics.mean_absolute_error, sklearn.metrics.max_error],
          plots=[plot_linear_exp, err_hist])
 ]
