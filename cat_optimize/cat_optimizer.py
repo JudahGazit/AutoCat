@@ -1,5 +1,8 @@
+import keras
+import keras.layers
 import pandas as pd
 import scipy.stats
+import sklearn
 from matplotlib import pyplot as plt
 import numpy as np
 from sklearn.cluster import DBSCAN
@@ -18,6 +21,7 @@ class CatOptimizer:
         self.category_mapping = {}
         self.category_kind = {}
         self.small_categories_mapping = {}
+        self.onehot_embeddings = {}
 
     def _convert_to_categorical(self, data, categorical_columns):
         for column in categorical_columns:
@@ -26,7 +30,7 @@ class CatOptimizer:
             self.category_mapping[column] = category_column.cat.categories
         return data
 
-    def __corr_of_categories(self, categories: pd.Series, target: pd.Series):
+    def _corr_of_categories(self, categories: pd.Series, target: pd.Series):
         one_hot = pd.get_dummies(categories)
         corrs = []
         for column in one_hot.columns:
@@ -69,28 +73,45 @@ class CatOptimizer:
         data_with_target = data.join(target)
         for column in self.category_mapping:
             mean_target = data_with_target.groupby(column).mean()[target.name]
-            _, p_value = scipy.stats.shapiro(mean_target)
-            if p_value < 0.05:
+            if len(mean_target) < 3 or scipy.stats.shapiro(mean_target)[1] < 0.05:
                 self.category_kind[column] = 'ordinal'
                 self.__sort_category_by_correlation(column, data, target)
             else:
                 self.category_kind[column] = 'one_hot'
+                self._build_one_hot_encoder(data, column, target)
         return data
 
     def __sort_category_by_correlation(self, column, data, target):
-        correlation_to_target = self.__corr_of_categories(data[column], target)
+        correlation_to_target = self._corr_of_categories(data[column], target)
         sorted_categories = correlation_to_target.sort_values().index.to_list()
         self.category_mapping[column] = sorted_categories
         data[column] = data[column].cat.reorder_categories(sorted_categories)
 
-    def _convert_categories_to_numeric(self, data, column):
+    def _build_one_hot_encoder(self, data, column, target):
+        num_categories = len(data[column].cat.categories)
+        if num_categories > 10 and False:
+            model = keras.models.Sequential()
+            model.add(keras.layers.Input(1))
+            model.add(keras.layers.Embedding(num_categories, 16))
+            model.add(keras.layers.Dense(1))
+            model.compile(optimizer='adam', loss='mse', metrics=['mse'])
+            intermediate_layer_model = keras.models.Model(inputs=model.input, outputs=model.layers[0].output)
+            model.fit(data[column].cat.codes, np.log(target), 32, 2, True)
+            embedding = intermediate_layer_model.predict(np.arange(num_categories)).squeeze()
+        else:
+            embedding = np.eye(num_categories)
+        self.onehot_embeddings[column] = embedding
+
+    def _convert_categories_to_numeric(self, data, column, target=None):
         data[column] = data[column].cat.codes
         return data
 
     def _convert_to_one_hot(self, data, column):
-        one_hot = pd.get_dummies(data[column])
-        one_hot = one_hot.rename(columns={category: f'{column}={category}' for category in one_hot.columns})
-        data = data.drop(columns=[column]).join(one_hot)
+        # one_hot = pd.get_dummies(data[column], prefix=column, prefix_sep='=')
+        # data = data.drop(columns=[column]).join(one_hot)
+        encodings = self.onehot_embeddings[column][data[column].cat.codes]
+        encodings = pd.DataFrame(encodings, columns=[f'{column}_{i}' for i in range(encodings.shape[1])], index=data.index)
+        data = data.drop(columns=[column]).join(encodings)
         return data
 
     def _convert_by_kind(self, data):
@@ -103,7 +124,7 @@ class CatOptimizer:
         data = data.copy()
         categorical_columns = self.cat_discover.discover_categories(data)
         data = self._convert_to_categorical(data, categorical_columns)
-        self._find_small_categories(data, target)
+        # self._find_small_categories(data, target)
         data = self._convert_missing_categories(data)
         data = self._find_and_sort_categories(data, target)
         data = self._convert_by_kind(data)
