@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from test.data_prep.data_prep_base import DataPrepBase
+from evaluate.data_prep.data_prep_base import DataPrepBase
 
 
 class AustralianWeather(DataPrepBase):
@@ -9,8 +9,10 @@ class AustralianWeather(DataPrepBase):
         self.target_variable = 'RainTomorrow'
         self.na_value = 'NA'
         self.date = 'Date'
+        self.yes_no_map = {'Yes': 1, 'No': 0}
+        self.yes_no_columns = ['RainToday', self.target_variable]
 
-    def replace_na_values(self, data):
+    def _replace_na_values(self, data):
         data = data.replace(self.na_value, np.nan)
         data = data[data[self.target_variable].notna()]
         for column in data.columns:
@@ -21,16 +23,22 @@ class AustralianWeather(DataPrepBase):
             data[column] = data[column].fillna(fill_value)
         return data
 
-    def date_extraction(self, data):
+    def _date_extraction(self, data):
         data[self.date] = pd.to_datetime(data[self.date])
         data[f'{self.date}_month'] = data[self.date].dt.month
         data[f'{self.date}_day'] = data[self.date].dt.day
         data = data.drop(columns=[self.date])
         return data
 
+    def _map_yes_no_values(self, data):
+        for column in self.yes_no_columns:
+            data[column] = data[column].map(self.yes_no_map.get)
+        return data
+
     def transform(self, data: pd.DataFrame):
-        data = self.replace_na_values(data)
-        data = self.date_extraction(data)
+        data = self._map_yes_no_values(data)
+        data = self._replace_na_values(data)
+        data = self._date_extraction(data)
         return data.drop(columns=[self.target_variable]), data[self.target_variable]
 
 
