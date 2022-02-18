@@ -14,7 +14,7 @@ class AustralianWeather(DataPrepBase):
 
     def _replace_na_values(self, data):
         data = data.replace(self.na_value, np.nan)
-        data = data[data[self.target_variable].notna()]
+        data = data[data[self.target_variable].notna()].copy()
         for column in data.columns:
             if data.dtypes[column] == float:
                 fill_value = data[column].median()
