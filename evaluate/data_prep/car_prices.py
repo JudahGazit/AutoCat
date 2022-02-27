@@ -6,6 +6,16 @@ from evaluate.data_prep.data_prep_base import DataPrepBase
 
 
 class CarPrices(DataPrepBase):
+    """
+    Data preperation for Polish Car Prices dataset taken from Kaggle:
+    https://www.kaggle.com/aleksandrglotov/car-prices-poland
+
+    Pipeline description:
+        - Drop redundant columns
+        - Drop redundant province ("(")
+        - Drop price outliers
+        - Return prices in log scale
+    """
     def __init__(self):
         self.price_column = 'price'
 
