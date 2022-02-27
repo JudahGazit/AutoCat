@@ -9,26 +9,6 @@ to them.
 Full report:
 http://link_to_report.pdf
 
-## Installation
-
-### Option #1: Using setup.py
-```shell
-
-git clone https://github.com/JudahGazit/AutoCat.git
-cd autocat
-python setup.py install
-
-```
-
-### Option #2: Using requirements.txt
-```shell
-
-git clone https://github.com/JudahGazit/AutoCat.git
-cd autocat
-pip install -r requirements.txt
-
-```
-
 ## Usage
 
 First, load a dataset and split into train and test.
@@ -81,3 +61,23 @@ print(model.score(X_test_auto, Y_test))  ## R^2 = 0.71735
 
 ```
 AutoCat boosted the R^2 by 14.7% without adding any additional complexity to the model.
+
+## Installation
+
+### Option #1: Using setup.py
+```shell
+
+git clone https://github.com/JudahGazit/AutoCat.git
+cd autocat
+python setup.py install
+
+```
+
+### Option #2: Using requirements.txt
+```shell
+
+git clone https://github.com/JudahGazit/AutoCat.git
+cd autocat
+pip install -r requirements.txt
+
+```
