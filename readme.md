@@ -29,8 +29,8 @@ Let's evaluate this embedding with a simple model:
 
 ```python
 
-from cat_optimize.cat_discover import CatDiscover
-from cat_optimize.transformers.naive_cat import NaiveCategories
+from auto_cat.cat_discover import CatDiscover
+from auto_cat.transformers.naive_cat import NaiveCategories
 from sklearn.ensemble import RandomForestRegressor
 
 categorical_columns = CatDiscover().discover_categories(X_train)
@@ -48,7 +48,7 @@ Now, let's use AutoCat and see the difference. Note that model complexity stays 
 
 ```python
 
-from cat_optimize.cat_optimizer import AutoCat
+from auto_cat.auto_cat import AutoCat
 from sklearn.ensemble import RandomForestRegressor
 
 autocat = AutoCat()
