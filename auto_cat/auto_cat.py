@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import scipy.stats
 
-from cat_optimize.cat_discover import CatDiscover
+from auto_cat.cat_discover import CatDiscover
 
 
 def cramers_V(var1, var2):
