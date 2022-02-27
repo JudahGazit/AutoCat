@@ -6,7 +6,7 @@ and most importantly - picks the right embedding for them based on the correlati
 AutoCat significantly improves the performance of both regression and classification models without adding anymore complexity
 to them.
 
-Full Report:
+Full report:
 http://link_to_report.pdf
 
 ## Usage
