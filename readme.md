@@ -61,4 +61,4 @@ model = RandomForestRegressor(n_estimators=20, min_samples_leaf=5, max_depth=10)
 print(model.score(X_test_auto, Y_test)) ## 0.71735
 
 ```
-AutoCat boosted the R^2 by 14.7% without adding anymore complexity to the model.
+AutoCat boosted the $R^2$ by 14.7% without adding anymore complexity to the model.
