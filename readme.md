@@ -40,7 +40,7 @@ X_test_naive = naive_transformer.transform(X_test)
 
 model = RandomForestRegressor(n_estimators=20, min_samples_leaf=5, max_depth=10).fit(X_train_naive, Y_train)
 
-print(model.score(X_test_naive, Y_test)) ## 0.62519
+print(model.score(X_test_naive, Y_test)) ## R^2 = 0.62519
 
 ```
 
@@ -58,7 +58,7 @@ X_test_auto = autocat.transform(X_test)
 
 model = RandomForestRegressor(n_estimators=20, min_samples_leaf=5, max_depth=10).fit(X_train_auto, Y_train)
 
-print(model.score(X_test_auto, Y_test)) ## 0.71735
+print(model.score(X_test_auto, Y_test)) ## R^2 = 0.71735
 
 ```
 AutoCat boosted the R^2 by 14.7% without adding any additional complexity to the model.
