@@ -19,7 +19,7 @@ def cramers_V(var1, var2):
     return np.sqrt(stat / (obs * mini))
 
 
-class CatOptimizer:
+class AutoCat:
     """
     AutoCat's main optimizer. Automatically detects and embeds categorical features in a given dataset.
 

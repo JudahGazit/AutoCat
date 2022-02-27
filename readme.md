@@ -48,17 +48,16 @@ Now, let's use AutoCat and see the difference. Note that model complexity stays 
 
 ```python
 
-from cat_optimize.cat_optimizer import CatOptimizer
+from cat_optimize.cat_optimizer import AutoCat
 from sklearn.ensemble import RandomForestRegressor
 
-
-autocat = CatOptimizer()
+autocat = AutoCat()
 X_train_auto = autocat.fit_transform(X_train, Y_train)
 X_test_auto = autocat.transform(X_test)
 
 model = RandomForestRegressor(n_estimators=20, min_samples_leaf=5, max_depth=10).fit(X_train_auto, Y_train)
 
-print(model.score(X_test_auto, Y_test)) ## R^2 = 0.71735
+print(model.score(X_test_auto, Y_test))  ## R^2 = 0.71735
 
 ```
 AutoCat boosted the R^2 by 14.7% without adding any additional complexity to the model.

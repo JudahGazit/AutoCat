@@ -7,7 +7,7 @@ from sklearn.linear_model import LinearRegression, LogisticRegression
 from xgboost import XGBRegressor, XGBClassifier
 
 from cat_optimize.cat_discover import CatDiscover
-from cat_optimize.cat_optimizer import CatOptimizer
+from cat_optimize.cat_optimizer import AutoCat
 from cat_optimize.transformers.naive_cat import NaiveCategories
 from evaluate.data_prep.australian_weather import AustralianWeather
 from evaluate.data_prep.car_prices import CarPrices
@@ -95,7 +95,7 @@ def experiment_on_dataset(dataset):
     X_test_naive = naive_categories.transform(X_test)
     naive_results = experiment('NAIVE', dataset, X_train_naive, X_test_naive, Y_train, Y_test)
 
-    auto_categories = CatOptimizer()
+    auto_categories = AutoCat()
     Y_train_auto = Y_train if dataset.get('target_method') is None else dataset['target_method'](Y_train)
     X_train_auto = auto_categories.fit_transform(X_train, Y_train_auto)
     X_test_auto = auto_categories.transform(X_test)
