@@ -21,7 +21,7 @@ dataset_models = [
     dict(name='car_prices',
          data=pd.read_csv('./evaluate/datasets/Car_Prices_Poland_Kaggle.csv').sample(10000),
          prep=CarPrices(),
-         model=[RandomForestRegressor(n_estimators=40, min_samples_leaf=3, max_depth=100),
+         model=[RandomForestRegressor(n_estimators=40, min_samples_leaf=3, max_depth=10),
                 LinearRegression(),
                 XGBRegressor(max_depth=5, n_estimators=20)],
          metrics=[sklearn.metrics.mean_absolute_error, sklearn.metrics.max_error],
@@ -40,7 +40,7 @@ dataset_models = [
          data=None,
          prep=GenerateDataset(data_type='linear_regression'),
          model=[
-             RandomForestRegressor(n_estimators=20, min_samples_leaf=5, max_depth=100),
+             RandomForestRegressor(n_estimators=20, min_samples_leaf=5, max_depth=10),
              LinearRegression(),
              XGBRegressor(max_depth=5, n_estimators=20)],
          metrics=[sklearn.metrics.mean_absolute_error, sklearn.metrics.max_error]),
