@@ -5,6 +5,16 @@ from evaluate.data_prep.data_prep_base import DataPrepBase
 
 
 class AustralianWeather(DataPrepBase):
+    """
+    Data preperation for Australian Weather dataset taken from Kaggle:
+    https://www.kaggle.com/jsphyg/weather-dataset-rattle-package
+
+    Pipeline description:
+        - Replace `yes` / `no` values in target into 1 / 0
+        - Remove NA values from target
+        - Convert NA values to median / frequent value in columns
+        - Extract month and day from dates
+    """
     def __init__(self):
         self.target_variable = 'RainTomorrow'
         self.na_value = 'NA'
