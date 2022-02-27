@@ -9,6 +9,26 @@ to them.
 Full report:
 http://link_to_report.pdf
 
+## Installation
+
+### Option #1: Using setup.py
+```shell
+
+git clone https://github.com/JudahGazit/AutoCat.git
+cd autocat
+python setup.py install
+
+```
+
+### Option #2: Using requirements.txt
+```shell
+
+git clone https://github.com/JudahGazit/AutoCat.git
+cd autocat
+pip install -r requirements.txt
+
+```
+
 ## Usage
 
 First, load a dataset and split into train and test.
