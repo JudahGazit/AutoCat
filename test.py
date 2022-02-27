@@ -6,9 +6,9 @@ from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from xgboost import XGBRegressor, XGBClassifier
 
-from cat_optimize.cat_discover import CatDiscover
-from cat_optimize.cat_optimizer import AutoCat
-from cat_optimize.transformers.naive_cat import NaiveCategories
+from auto_cat.cat_discover import CatDiscover
+from auto_cat.auto_cat import AutoCat
+from auto_cat.transformers.naive_cat import NaiveCategories
 from evaluate.data_prep.australian_weather import AustralianWeather
 from evaluate.data_prep.car_prices import CarPrices
 from evaluate.data_prep.generate_dataset import GenerateDataset
