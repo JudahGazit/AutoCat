@@ -6,8 +6,10 @@ and most importantly - picks the right embedding for them based on the correlati
 AutoCat significantly improves the performance of both regression and classification models without adding anymore complexity
 to them.
 
+AutoCat was created as the final project for the Tabular Data Science course (89-547, BIU, 2022).
+
 Full report:
-http://link_to_report.pdf
+<a href="https://github.com/JudahGazit/AutoCat/blob/main/report/autocat.pdf"> https://github.com/JudahGazit/AutoCat/blob/main/report/autocat.pdf </a>
 
 ## Usage
 
