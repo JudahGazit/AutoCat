@@ -36,6 +36,7 @@ class AustralianWeather(DataPrepBase):
         return data
 
     def transform(self, data: pd.DataFrame):
+        data = data.copy()
         data = self._map_yes_no_values(data)
         data = self._replace_na_values(data)
         data = self._date_extraction(data)
