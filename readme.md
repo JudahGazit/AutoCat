@@ -11,6 +11,9 @@ AutoCat was created as the final project for the Tabular Data Science course (89
 Full report:
 <a href="https://github.com/JudahGazit/AutoCat/blob/main/report/autocat.pdf"> https://github.com/JudahGazit/AutoCat/blob/main/report/autocat.pdf </a>
 
+Example Notebook:
+<a href="https://github.com/JudahGazit/AutoCat/blob/main/example_notebook.ipynb"> https://github.com/JudahGazit/AutoCat/blob/main/example_notebook.ipynb </a>
+
 ## Usage
 
 First, load a dataset and split into train and test.
