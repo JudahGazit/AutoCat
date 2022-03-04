@@ -40,28 +40,33 @@
 
 \begin{abstract}
 \bfseries
-Although categorical features appear everywhere, they create enormous problems to existing learning methods. The ambiguity they create regarding their numerical representation -- whether they are nominal or ordinal, creates a great challenge for every learning algorithm in using them, and demands from the data scientists to manually embed them properly. While common practices like One-Hot Encoding avoid the question of ordinality, they demand much more complex algorithms. Here, AutoCat is introduced -- an automated embedding solution for categorical features. Using the target variable, AutoCat automatically detects ordinal features and sorts them in the right way, and applies the One-Hot encoding only on nominal features, thus creating far more efficient learning. AutoCat outperformed naive embedding approaches in both regression and classification tasks, without changing the model complexity.
+Although categorical features appear everywhere, they create enormous problems to existing learning methods. The ambiguity they create regarding their numerical representation -- whether they are nominal or ordinal, creates a great challenge for every learning algorithm to fully utilize them, and demand the data scientists to manually embed them properly. While common practices like One-Hot Encoding avoid the question of ordinality, they demand much more complex algorithms. Here, AutoCat is introduced -- an automatic embedding solution for categorical features. Using the target variable, AutoCat automatically detects ordinal features and sorts them in the right way, and applies the One-Hot encoding only on nominal features, thus allowing for more efficient learning. AutoCat outperformed naive embedding approaches in both regression and classification tasks, without changing the model complexity.
 \end{abstract}
 
 % \begin{multicols}{2}
 \section{Introduction}
 In almost every tabular dataset, One can find some categorical or ordinal features. These features capture fundamental aspects in the examined domain - they might represent someone’s gender or level of education, the color of a product, or the car’s manufacturer. Although these features might stand at the core of the task we intend to perform, most common models – including regression-based models, tree-based models, or neural networks – are not natively designed to benefit from them, thus some kind of data preparation process must be performed beforehand. This data preparation process, also known as feature engineering, is usually done manually.
 
-A categorical feature consists of two or more categories, which may or may not be correlated to the dependent variable we intend to predict. \textbf{Nominal Categorical Features} are defined as a list of labels without any immediate way of sorting them, e.g., gender or car manufacturer. Also, \textbf{Ordinal Categorical Features} are defined as features with some kind of natural way to sort them, e.g., education level. Note that in many cases these features are not numerical, thus deciding whether a feature is ordinal (and of course finding the right ordering) is not trivial.
+A categorical feature consists of two or more categories, which may or may not be correlated to the dependent variable we intend to predict. \textbf{Nominal Categorical Features} are defined as a list of labels without any immediate way of sorting them, e.g., gender or car manufacturer. Also, \textbf{Ordinal Categorical Features} are defined as features with some kind of natural way to sort them, e.g., education level. Note that in many cases these features are not numerical, thus deciding whether a feature is ordinal (and consequently finding the right ordering) is not trivial.
 
-When done correctly, modelling these categorical features can significantly boost the performance of a model. For example, a tree-based model would benefit from the ordinal sorting of a feature as it can achieve the same performance with shallower trees. 
+When done correctly, embedding these categorical features can significantly boost the performance of a model. For example, a tree-based model would benefit from the ordinal sorting of a feature as it can achieve the same performance with shallower trees. 
 Common representation of these features are the One-Hot encoding, where each category is modelled as a different binary feature, and Label-Encoding, where we assign an integer to replace each label.
 
 Here, I introduce AutoCat -- a python library designed to automatically detect and embed categorical features. AutoCat uses the target variable of the training set in order to surmise if the feature is nominal or ordinal, and if it is indeed the latter -- sort it in the right order. AutoCat replaces the manual feature engineering process needed when handling categorical features, and is able to significantly boost the performance of the applied algorithm.
 
 \section{Related Work}
-Many previous works have reviewed the domain of categorical data analysis, both from the statistical point of view, and both for machine-learning algorithms \cite{agresti2018introduction, Stevens1946}. Ordinal scales defer from nominal by having a ranking, but both do not have scaling (both for interval or ratio). That is, although the ordinal categories "Small", "Medium" and "Large" have clear ranking ("Small" < "Medium" < "Large"), there is no way to quantify how big is the "gap" between each consecutive pair.
+Many previous works have reviewed the domain of categorical data analysis, both from the statistical point of view, and for machine-learning algorithms \cite{agresti2018introduction, Stevens1946}. Ordinal scales defer from nominal by having a ranking, but they both do not have scaling (for interval or ratio). That is, although the ordinal categories "Small", "Medium" and "Large" have clear ranking ("Small" $<$ "Medium" $<$ "Large"), there is no way to quantify how big is the "gap" between each consecutive pair.
 
-The One-Hot Encoding converts a set of categories $C = \{c_1, \dots, c_k\}$ into sparse vectors $\{0, 1\}^k$. This encoding detaches any kind of ordinal sorting the categories might have had, regarding each possible category as a new binary feature.
-Recent works reviewed the usage of different embedding approaches for machine learning \cite{Potdar2017}, suggesting that the One-Hot Encoding performs better than any other embedding technique, but comes with higher cost in performance. 
-Other works reduce the number of dimensions used in One-Hot Encoding for the target, instead of features, using training samples \cite{Rodrguez2018}.
+The One-Hot Encoding converts a set of categories $C = \{c_1, \dots, c_k\}$ into sparse vectors $\{0, 1\}^k$. This encoding detaches any kind of ordinal sorting the categories might have had, and regards each possible category as a new binary feature.
+Recent works reviewed the usage of different embedding approaches for machine learning \cite{Potdar2017}, suggesting that the One-Hot Encoding performs better than any other embedding technique, but comes with higher cost in model complexity. 
+Other works reduce the number of dimensions used in One-Hot Encoding for the target labels, instead of features, using training samples \cite{Rodrguez2018}.
 
-Before all that, categorical data analysis laid the foundations for measuring the association between nominal and ordinal features. Many association measures are based upon the $\chi ^2$ statistic: Cramér's V measures the association between two nominal variables \cite{cramer1999mathematical}, The $M^2$ statistic measures the association between two ordinal features \cite{agresti2007an}. Measuring the association between ordinal and continuous variables can be done using other common association metrics, such as Pearson or Spearman correlation coefficients. 
+Originaly, categorical data analysis laid the foundations for measuring the association between nominal and ordinal features. Many association measures are based upon the $\chi ^2$ statistic: Cramér's V measures the association between two nominal variables \cite{cramer1999mathematical}, The $M^2$ statistic measures the association between two ordinal features \cite{agresti2007an}. Measuring the association between ordinal and continuous variables can be done using other common association metrics, such as Pearson or Spearman correlation coefficients. 
+
+\section{AutoCat}
+The main problem in utilizing categorical features lays in the fact that there is no immediate relation between the categories. As most learning algorithms refer to each feature as numerical, randomly assigning a numerical representation for each category may have catastrophic effect over the performance of the algorithm, or to heavily affect its complexity (Figure \ref{figure:fig1}). Moreover, in some cases, the categories have no ordinal meaning, so enforcing some order over them may result in a big dropout in performance between training and testing. The One-Hot Encoding became popular as it removes the need for picking the right order of categories, but demand more complex models, as the number of features is effectively larger. 
+
+Here, I suggest mitigating this problem by looking for the optimal ordinal representation of categories, or to use the One-Hot Encoding if such ordering could not be found. First, I remove smaller categories and bin them into several default classes, in order to reduce the number of categories needed to explore. Next, I greedily sort the categories using the target variable as a guild line for detecting their inner structure. Finally, the resulting sorted categorical representation is evaluated and neglected if the inner structure does not seem to be ordinal.
 
 \begin{figure*}
 \includegraphics[width=\textwidth]{imgs/figure1}
@@ -71,15 +76,10 @@ Before all that, categorical data analysis laid the foundations for measuring th
 Darker colors in the decision trees \textbf{(B-D)} represent higher predicted values.\\
 \textbf{(A)} A dataset with 15 categories ("category" column), which are linearly correlated to the target variable ("value" column). The "nominal representation" column randomly shuffles the labels of each category. $R(\text{Ordinal Repr.}, \text{Value})=1, R(\text{Nominal Repr.}, \text{Value})=0.032$ \\
 \textbf{(B)} A decision tree regressor fitted over the ordinal representation and the target value. The tree is relatively shallow and well-balanced, (depth = 4), which makes this representation the most efficient in terms of model complexity. \\
-\textbf{(C)} A decision tree regressor fitted over the nominal representation and the target value. Unlike \textbf{(B)}, the tree is much deeper and unbalanced (depth = 8) \\
+\textbf{(C)} A decision tree regressor fitted over the nominal representation and the target value. Unlike \textbf{(B)}, the tree is much deeper and unbalanced (depth = 8). When the decision tree regarded the nominal representation as numerical, it demanded a more complex model for achieving the same results as (B) \\
 \textbf{(D)} A decision tree regressor fitted over the One-Hot encoding and the target value. Here we find the deepest tree (depth = 14). \\
 }
 \end{figure*}
-
-\section{AutoCat}
-The main problem in utilizing categorical features lays in the fact that there is no immediate relation between the categories. As most learning algorithms refer to each feature as numerical, randomly assigning a numerical representation for each category may have catastrophic effect over the performance of the algorithm, or to heavily affect its complexity (Figure \ref{figure:fig1}). Moreover, in some cases, the categories have no ordinal meaning, so enforcing some order over them may result in a big dropout in performance between training and testing. The One-Hot Encoding became popular as it removes the need for picking the right order of categories, but demand more complex models, as the number of features is effectively larger. 
-
-Here, I suggest mitigating this problem by looking for the optimal ordinal representation of categories, or to use the One-Hot Encoding if such ordering could not be found. First, I remove smaller categories and bin them into several default classes, in order to reduce the number of categories we explore. Next, I greedily sort the categories using the target variable as a guild line for detecting their inner structure. Then, the resulting sorted categorical representation is evaluated and neglected if the inner structure does not seem to be ordinal.
 
 \subsection{Dropping Rare Categories}
 Too many categories, where a big portion of them is rare -- meaning, that there is only a very small number of samples in the dataset to represent them, creates an unnecessary challenge for many learning algorithms. Unlike numerical features, where One would expect the algorithm to generalize from nearby samples, categories bear no scale or immediate ordering for such generalization to emerge. Hence, a common technique for handling categorical variables is to merge several smaller categories into bigger ones. 
@@ -91,12 +91,12 @@ Let $C_\epsilon \subseteq C$ be the unpopular categories, $C_\epsilon = \{c \in 
 
 Furthermore, if the target variable is continuous, i.e., $Y = \{y_i \in \mathbb{R}\}_{i=1}^N$, One can replace $C_\epsilon$ with several dummy categories in order to maintain their various impact over the target. Let $Y_c = \{y_i\ \vert\ x_i = c\}$ be the targets for the samples in category $c\in C$. By binning $C_\epsilon$ using their mean target values $\bar{Y}_c$ into $t$ subsets, One can replace them with $\{C_i^*\}_{i=1}^t$ dummy categories.
 
-Overall, the resulting set of categories is now smaller, and most impotently -- stabler, as it is less sensitive to training set sampling (which might have dropped the rarest of categories).
+Overall, the resulting set of categories is now smaller, and most importantly -- stabler, as it is less sensitive to training set sampling (which might have missed the rarest of categories).
 
 \subsection{Embedding for Regression}
 Most of the models designed for regression problems, implicitly or explicitly utilize from features with higher correlation to the target variable. For example, Linear Regression tries to directly quantify the linear correlation between features and target. Decision-Tree based methods benefit from a linearly-correlated feature, as every "cut" it makes affects the predicted value more dramatically. Therefore, if the categorical feature can be mapped in a way that maximizes the correlation to the target variable, it may significantly improve the model's performance without introducing additional complexity in training.
 
-Let $X=\{x_i \in C\}_{i=1}^N$ be a feature of categories $C=\{c_1,\dots,c_k\}$, and let $Y=\{y_i\}_{i=1}^N$ be the target. Also, let $\rho$ be a correlation coefficient function. 
+Let $X=\{x_i \in C\}_{i=1}^N$ be a feature of categories $C=\{c_1,\dots,c_k\}$, and let $Y=\{y_i\}_{i=1}^N$ be the target. Also, let $\rho$ be a correlation coefficient metric. 
 A one-to-one mapping of categories $f: C\to\{1,\dots,k\}$ is considered optimal, according to  the target variable and the given $\rho$, if $\rho(f(X), Y)$ is maximal.
 For instance, if $\rho = R$ the Pearson Correlation Coefficient, such optimal mapping would make $f(X)$ as linearly correlated as possible to the target $Y$. In other words, if we regard $f(X$) as a numerical feature, it will be as correlated to $Y$ as it can get.
 
@@ -132,7 +132,7 @@ Similarly to regression, in order to distinct between ordinal and nominal variab
 \textbf{Finding the ordinal sorting for classification models.} \\
 \textbf{(A)} A dataset with 4 categories and two target classes. \\
 \textbf{(B)} The cross tabulation of (A). Let $\varphi_{c_i} = \text{Cramér'sV}(\mathbb{I}_{[X = c_i]}, Y)$ the Cramér's V correlation between the one-hot representation of each category. This measure cannot help in finding the right order of categories. \\
-\textbf{(C)} The values of $\omega_{c_i}$ and the order found using the minimal spanning tree. $\omega_{c_i}$ captures the ratio of each class in the samples of a single category. By regarding the set of points $\omega = \{\omega_{c_i}\}_{c_i \in C}$ as a full graph, and finding the minimal spanning tree with regard to the distance between these points, the right sort of categories was detected (black arrows).
+\textbf{(C)} The values of $\omega_{c_i}$ and the order found using the minimal spanning tree. $\omega_{c_i}$ captures the ratio of each class in the samples of a single category. By regarding the set of points $\omega = \{\omega_{c_i}\}_{c_i \in C}$ as a full graph, and finding the minimal spanning tree with regard to the distance between these points, the right sort of categories was detected (gray arrows).
 }
 \end{figure*}
 
@@ -159,7 +159,7 @@ Overall, AutoCat increased the $R^2$ in $25\%$ on average, decreased the mean ab
   caption = {AutoCat Performance},
   label = {tab:test},
 ]{
-  colspec = {|X[0.7]X[0.3]XXXX|},
+  colspec = {|X[0.7]X[0.3]XXXX[0.7]|},
   rowhead = 1,
   hlines,
   row{even} = {gray9},
