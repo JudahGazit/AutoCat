@@ -37,7 +37,7 @@ from sklearn.ensemble import RandomForestRegressor
 
 categorical_columns = CatDiscover().discover_categories(X_train)
 naive_transformer = NaiveCategories()
-X_train_naive = naive_transformer.fit_transform(X_train)
+X_train_naive = naive_transformer.fit_transform(X_train, categorical_columns)
 X_test_naive = naive_transformer.transform(X_test)
 
 model = RandomForestRegressor(n_estimators=20, min_samples_leaf=5, max_depth=10).fit(X_train_naive, Y_train)

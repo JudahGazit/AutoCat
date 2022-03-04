@@ -39,15 +39,17 @@ class AutoCat:
         :param min_categories_for_bins: Minimal number of small categories to start binning them into default categories.
         Otherwise, a single default category is used.
         :param n_categorical_bins: Number of bins to use when binning small categories together.
+        :param ordinal_corr_threshold: Threshold of correlation for ordinal variables. Default is 0.05
     """
     def __init__(self, cat_discover=None, min_items_in_cat=0.005, min_categories_to_handle=5, default_cat_name='ELSE',
-                 min_categories_for_bins=10, n_categorical_bins=3):
+                 min_categories_for_bins=10, n_categorical_bins=3, ordinal_corr_threshold=0.05):
         self.cat_discover = cat_discover or CatDiscover()
         self.min_items_in_cat = min_items_in_cat
         self.min_categories_to_handle = min_categories_to_handle
         self.min_categories_for_bins = min_categories_for_bins
         self.default_cat_name = default_cat_name
         self.n_categorical_bins = n_categorical_bins
+        self.ordinal_corr_threshold = ordinal_corr_threshold
         self.category_mapping = {}
         self.category_kind = {}
         self.small_categories_mapping = {}
@@ -114,7 +116,7 @@ class AutoCat:
         for column in self.category_mapping:
             self.category_kind[column] = 'ordinal'
             corr = self._sort_category_by_correlation(column, data, target, is_classification)
-            if abs(corr) < 0.05:
+            if abs(corr) < self.ordinal_corr_threshold:
                 self.category_kind[column] = 'one_hot'
                 self._build_one_hot_encoder(data, column)
         return data
@@ -174,6 +176,7 @@ class AutoCat:
         return data
 
     def transform(self, data: pd.DataFrame):
+        data = data.copy()
         data = self._convert_missing_categories(data)
         data = self._convert_by_kind(data)
         return data
